@@ -1,0 +1,67 @@
+const int trigPin = 9;
+const int echoPin = 10;
+const int redLed = 2;
+const int yellowLed = 3;
+const int greenLed = 4;
+const int buzzer = 5;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(redLed, OUTPUT);
+  pinMode(yellowLed, OUTPUT);
+  pinMode(greenLed, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+  Serial.begin(9600);
+}
+
+float getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  long duration = pulseIn(echoPin, HIGH, 30000);
+  if (duration == 0) return -1;
+  return (duration * 0.0343) / 2;
+}
+
+void loop() {
+  float distance = getDistance();
+
+  Serial.print("Distance: ");
+  Serial.println(distance);
+
+  if (distance == -1) {
+    digitalWrite(redLed, LOW);
+    digitalWrite(yellowLed, LOW);
+    digitalWrite(greenLed, LOW);
+    noTone(buzzer);
+
+  } else if (distance < 5) {
+    // RED - closer than 5cm
+    digitalWrite(redLed, HIGH);
+    digitalWrite(yellowLed, LOW);
+    digitalWrite(greenLed, LOW);
+    tone(buzzer, 1000);
+
+  } else if (distance < 10) {
+    // YELLOW - between 5cm and 10cm
+    digitalWrite(redLed, LOW);
+    digitalWrite(yellowLed, HIGH);
+    digitalWrite(greenLed, LOW);
+    tone(buzzer, 400);
+    delay(100);
+    noTone(buzzer);
+    delay(150);
+
+  } else {
+    // GREEN - more than 10cm
+    digitalWrite(redLed, LOW);
+    digitalWrite(yellowLed, LOW);
+    digitalWrite(greenLed, HIGH);
+    noTone(buzzer);
+  }
+
+  delay(100);
+}
